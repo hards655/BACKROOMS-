@@ -17,18 +17,18 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Configure Android export environment
+      - name: Install Android export prerequisites
         shell: bash
         run: |
           set -euxo pipefail
+          apt-get update
+          apt-get install -y curl unzip
           godot --version
           ANDROID_SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/lib/android-sdk}}"
-          test -d "$ANDROID_SDK"
           JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-17-openjdk-amd64}"
+          test -d "$ANDROID_SDK"
           test -d "$JAVA_HOME"
-          java -version
-          mkdir -p "$HOME/.local/share/godot/export_templates/4.3.stable"
-          mkdir -p "$HOME/.config/godot" "$HOME/.android" build
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.3.stable" "$HOME/.config/godot" "$HOME/.android" build
           curl -fL --retry 3 -o /tmp/godot-templates.tpz https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
           mkdir -p /tmp/godot-templates
           unzip -q /tmp/godot-templates.tpz -d /tmp/godot-templates
@@ -40,6 +40,9 @@ jobs:
           [resource]
           export/android/android_sdk_path = "$ANDROID_SDK"
           export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = "$HOME/.android/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
           EOF
 
       - name: Import project and validate main scene
@@ -55,7 +58,7 @@ jobs:
           set -euxo pipefail
           godot --headless --path . --export-debug "Android" build/BACKROOMS.apk
           test -s build/BACKROOMS.apk
-          file build/BACKROOMS.apk || true
+          file build/BACKROOMS.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
