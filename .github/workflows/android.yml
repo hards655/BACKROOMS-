@@ -19,13 +19,21 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Prepare Godot Android export templates
+      - name: Prepare Godot Android export toolchain
         shell: bash
         run: |
           set -euxo pipefail
           godot --version
-          test -d /usr/lib/android-sdk
+          ANDROID_HOME="${ANDROID_HOME:-/usr/lib/android-sdk}"
+          test -d "$ANDROID_HOME"
           test -d /usr/lib/jvm/java-17-openjdk-amd64
+          SDKMANAGER="$(find "$ANDROID_HOME" -type f -name sdkmanager -print -quit)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "Android sdkmanager not found under $ANDROID_HOME"
+            exit 1
+          fi
+          yes | "$SDKMANAGER" --licenses
+          "$SDKMANAGER" "platform-tools" "build-tools;33.0.2" "platforms;android-33"
           mkdir -p "$HOME/.local/share/godot/export_templates/4.3.stable" build
           if [ -d "$HOME/.local/share/godot/templates/4.3.stable" ]; then
             cp -a "$HOME/.local/share/godot/templates/4.3.stable/." "$HOME/.local/share/godot/export_templates/4.3.stable/"
@@ -37,7 +45,7 @@ jobs:
             cp /tmp/godot-templates/templates/* "$HOME/.local/share/godot/export_templates/4.3.stable/"
           fi
           test -s "$HOME/.local/share/godot/export_templates/4.3.stable/android_debug.apk"
-          test -s "$HOME/.android/debug.keystore" || test -s "$HOME/debug.keystore"
+          test -s "$HOME/debug.keystore" || test -s "$HOME/.android/debug.keystore"
           java -version
           ls -la "$HOME/.config/godot"
 
