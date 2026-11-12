@@ -1,0 +1,51 @@
+name: Build BACKROOMS Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Verify build toolchain
+        shell: bash
+        run: |
+          set -euxo pipefail
+          godot --version
+          test -n "${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          test -d "${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          java -version
+          mkdir -p build
+
+      - name: Import project and validate main scene
+        shell: bash
+        run: |
+          set -euxo pipefail
+          godot --headless --editor --path . --quit
+          godot --headless --path . --quit-after 2
+
+      - name: Export debug APK (arm64-v8a)
+        shell: bash
+        run: |
+          set -euxo pipefail
+          godot --headless --path . --export-debug "Android" build/BACKROOMS.apk
+          test -s build/BACKROOMS.apk
+          file build/BACKROOMS.apk || true
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BACKROOMS-LEVEL-0-Android-APK
+          path: build/BACKROOMS.apk
+          if-no-files-found: error
+          retention-days: 14
