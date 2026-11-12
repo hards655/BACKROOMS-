@@ -1,21 +1,30 @@
-# BACKROOMS: LEVEL 0 — Godot 4 Android prototype
+# BACKROOMS: LEVEL 0
 
-An offline first-person 3D horror prototype targeting Android arm64 in landscape orientation.
+A first-person 3D horror prototype built with Godot 4.3 for Android (arm64, landscape) and desktop testing.
 
-## Included gameplay
-- Procedurally assembled yellow maze with walls, floor, ceiling and scattered lighting.
-- First-person movement, mouse look, touch movement/look, sprint and flashlight.
-- Stamina and flashlight battery meters.
-- A pursuing monster, five collectible notes and a marked exit.
-- Russian-language HUD and end-game screen.
+## Gameplay in this project
 
-## Run in Godot
-Open the repository root in Godot 4.3 and run `main.tscn`. Desktop controls: WASD, mouse, Shift and F. On touch devices, drag the left side to move and the right side to look; use the on-screen sprint and flashlight buttons.
+- Procedurally generated yellow Backrooms-style maze with collision, ceiling and fluorescent fixtures.
+- First-person movement, mouse look, mobile multitouch movement/look, sprint and flashlight.
+- Stamina and flashlight battery management.
+- A pursuing creature with grid-based breadth-first-search pathfinding around maze walls.
+- Five collectible notes and a marked extraction point.
+- Procedurally synthesized fluorescent hum and proximity heartbeat; no external audio downloads are needed.
 
-## Android export
-The export preset is named `Android`, targets `arm64-v8a`, and exports to `build/BACKROOMS.apk`. Install the matching Godot Android export templates and configure Android SDK/JDK in Godot Editor Settings before exporting locally.
+## Run locally
 
-A GitHub Actions workflow at `.github/workflows/android.yml` runs on pushes to `main` and can also be started manually. It imports the project, runs a headless scene check, exports a debug APK and uploads it as an artifact when successful.
+1. Install Godot 4.3.
+2. Open this repository folder in Godot.
+3. Run `main.tscn`.
 
-## Verification and limitations
-The repository upload is complete, but this prototype has not yet been validated in the Godot editor or on a physical Android device. The GitHub Actions build is currently being checked. Visuals are procedural placeholders; this is an early prototype, not a finished commercial release. Monster navigation, touch controls, performance and collision behavior still need playtesting on Android hardware.
+Desktop controls: WASD, mouse, Shift to sprint, F to toggle flashlight. On touch devices, drag the left portion of the screen to move and the right portion to look; use the on-screen sprint and flashlight controls.
+
+## Android APK
+
+The export preset is named `Android`, targets `arm64-v8a`, and writes `build/BACKROOMS.apk`. The GitHub Actions workflow installs Godot 4.3 export templates, configures the Android SDK/JDK and a temporary debug signing key, validates the project, exports the debug APK and uploads it as a workflow artifact.
+
+Open the **Actions** tab and select the latest **Build BACKROOMS Android APK** run. The APK appears under Artifacts only after every export step succeeds. This is a debug APK for testing, not a Play Store release.
+
+## Current status and limitations
+
+This is an early playable prototype, not a finished commercial game. Godot headless import and scene startup are checked by CI; Android export and real-device playtesting must still pass before calling the APK verified. Procedural visuals/audio are placeholders, and touch layout, performance, collisions, monster behavior and balance need testing on physical Android devices. Menus, saves, multiple levels and endings are not implemented.
