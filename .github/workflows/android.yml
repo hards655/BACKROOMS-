@@ -17,15 +17,30 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Verify build toolchain
+      - name: Configure Android export environment
         shell: bash
         run: |
           set -euxo pipefail
           godot --version
-          test -n "${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
-          test -d "${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          ANDROID_SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/lib/android-sdk}}"
+          test -d "$ANDROID_SDK"
+          JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-17-openjdk-amd64}"
+          test -d "$JAVA_HOME"
           java -version
-          mkdir -p build
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.3.stable"
+          mkdir -p "$HOME/.config/godot" "$HOME/.android" build
+          curl -fL --retry 3 -o /tmp/godot-templates.tpz https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
+          mkdir -p /tmp/godot-templates
+          unzip -q /tmp/godot-templates.tpz -d /tmp/godot-templates
+          cp /tmp/godot-templates/templates/* "$HOME/.local/share/godot/export_templates/4.3.stable/"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US" -keyalg RSA -keysize 2048 -validity 10000
+          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_SDK"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          EOF
 
       - name: Import project and validate main scene
         shell: bash
