@@ -100,12 +100,12 @@ func _build_world() -> void:
 			var p := Vector3((x - 7) * CELL, WALL_H * 0.5, (z - 7) * CELL)
 			if maze[z][x] == "#":
 				add_child(_box(Vector3(CELL, WALL_H, CELL), p, wall_mat))
-			elif (x * 7 + z * 11) % 13 == 0:
+			elif (x * 7 + z * 11) % 31 == 0:
 				var light := OmniLight3D.new()
 				light.position = Vector3(p.x, WALL_H - 0.35, p.z)
 				light.light_color = Color(1.0, 0.86, 0.52)
-				light.light_energy = 1.25
-				light.omni_range = 9.0
+				light.light_energy = 0.85
+				light.omni_range = 7.0
 				add_child(light)
 				var fixture_mat := StandardMaterial3D.new()
 				fixture_mat.albedo_color = Color(1.0, 0.92, 0.66)
@@ -132,7 +132,7 @@ func _build_player() -> void:
 	flash.rotation.x = deg_to_rad(-5)
 	flash.light_color = Color(1, 0.94, 0.78)
 	flash.light_energy = 3
-	flash.spot_range = 24
+	flash.spot_range = 18
 	flash.spot_angle = 34
 	camera.add_child(flash)
 
