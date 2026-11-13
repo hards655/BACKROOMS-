@@ -48,6 +48,7 @@ jobs:
           godot --headless --path . --quit-after 2
 
       - name: Export browser game
+        shell: bash
         run: |
           set -euxo pipefail
           mkdir -p build/web
