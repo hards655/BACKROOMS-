@@ -41,6 +41,7 @@ jobs:
           test -s "$HOME/.local/share/godot/export_templates/4.3.stable/web_release.zip"
 
       - name: Validate project
+        shell: bash
         run: |
           set -euxo pipefail
           godot --headless --editor --path . --quit
